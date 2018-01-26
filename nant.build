@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<project name="EPPlusExample" default="run">
+  <target name="clean">
+    <delete file="bin/Program.exe" failonerror="false" />
+    <delete file="bin/Program.pdb" failonerror="false" />
+  </target>
+  <target name="build">
+    <mkdir dir="bin" />
+    <csc target="exe" output="bin/Program.exe" debug="true">
+      <sources>
+        <include name="Program.cs" />
+        <include name="MainForm.cs" />
+      </sources>
+      <references>
+        <include name="System.Windows.Forms.dll" />
+      </references>
+    </csc>
+  </target>
+  <target name="run" depends="build"> 
+    <exec program="bin/Program.exe"/>
+  </target>
+</project>
