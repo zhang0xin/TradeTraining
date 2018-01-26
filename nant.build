@@ -14,6 +14,7 @@
       </sources>
       <references>
         <include name="System.Windows.Forms.dll" />
+        <include name="System.Drawing.dll" />
       </references>
     </csc>
   </target>
