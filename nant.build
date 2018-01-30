@@ -7,14 +7,20 @@
   </target>
   <target name="build">
     <mkdir dir="bin" />
+    <copy todir="bin">
+        <fileset basedir="lib">
+            <include name="*.dll" />
+        </fileset>
+    </copy>
     <csc target="exe" output="bin/Program.exe" debug="true">
       <sources>
-        <include name="Program.cs" />
-        <include name="MainForm.cs" />
+        <include name="src/**/*.cs" /> 
       </sources>
       <references>
         <include name="System.Windows.Forms.dll" />
         <include name="System.Drawing.dll" />
+        <include name="System.Data.dll" />
+        <include name="lib/System.Data.SQLite.dll" />
       </references>
     </csc>
   </target>
