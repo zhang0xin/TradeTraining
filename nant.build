@@ -2,14 +2,14 @@
 
 <project name="EPPlusExample" default="run">
   <target name="clean">
-    <delete file="bin/Program.exe" failonerror="false" />
-    <delete file="bin/Program.pdb" failonerror="false" />
+    <delete dir="bin" failonerror="false" />
   </target>
   <target name="build">
     <mkdir dir="bin" />
     <copy todir="bin">
         <fileset basedir="lib">
             <include name="*.dll" />
+            <include name="*.config" />
         </fileset>
     </copy>
     <csc target="exe" output="bin/Program.exe" debug="true">
@@ -25,6 +25,6 @@
     </csc>
   </target>
   <target name="run" depends="build"> 
-    <exec program="bin/Program.exe"/>
+    <exec program="Program.exe" basedir="bin"/>
   </target>
 </project>
