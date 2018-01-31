@@ -12,6 +12,11 @@
             <include name="*.config" />
         </fileset>
     </copy>
+    <copy todir="bin">
+        <fileset basedir="data">
+            <include name="USDJPY2001.txt" />
+        </fileset>
+    </copy>
     <csc target="exe" output="bin/Program.exe" debug="true">
       <sources>
         <include name="src/**/*.cs" /> 

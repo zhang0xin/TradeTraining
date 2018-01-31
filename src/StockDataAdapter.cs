@@ -2,14 +2,12 @@ using System;
 using System.IO;
 using System.Text;
 using System.Data;
-using System.Data.SQLite;
 using KlerksSoft;
 
 namespace TradeTraining
 {
 	class StockDataAdapter
 	{
-		static string exedir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 		int start;
 		int size;
 		long startTime;
@@ -22,55 +20,6 @@ namespace TradeTraining
 		{
 			file = dataFile;	
 			Init(dataFile);
-			LoadFromCsv(dataFile);
-		}
-		void LoadFromCsv(string csvFile)
-		{
-			string tableName = Path.GetFileNameWithoutExtension(csvFile);
-			SQLiteConnection connection = new SQLiteConnection("data source = "+exedir+"//data.db");
-			SQLiteCommand cmdCreateTable = connection.CreateCommand();
-			cmdCreateTable.CommandText = 
-				"create table if not exists t_"+tableName+
-				"(time bigint primary key not null, "+
-				"ticker nvarchar(30), open decimal(10,4), high decimal(10,4), "+
-				"low decimal(10,4), close decimal(10,4), vol decimal(10,4))";
-			connection.Open();
-			cmdCreateTable.ExecuteNonQuery();
-			connection.Close();
-			
-
-			connection.Open();
-			string sqlInsert = "insert into t_" + tableName + " values (" + 
-				":time, :ticker, :open, :high, :low, :close, :vol)";
-			SQLiteTransaction trans = connection.BeginTransaction(IsolationLevel.ReadCommitted);
-			try{
-				using(var reader = new StreamReader(csvFile))
-				{
-					string line;
-					while((line = reader.ReadLine()) != null)
-					{
-						StockData data = StockData.Parse(line);
-						if (data == null) continue;
-						SQLiteCommand cmdInsert = connection.CreateCommand();
-						cmdInsert.CommandText = sqlInsert;
-						cmdInsert.Parameters.Add(new SQLiteParameter("time", data.Time));
-						cmdInsert.Parameters.Add(new SQLiteParameter("ticker", data.Ticker));
-						cmdInsert.Parameters.Add(new SQLiteParameter("open", data.Open));
-						cmdInsert.Parameters.Add(new SQLiteParameter("high", data.High));
-						cmdInsert.Parameters.Add(new SQLiteParameter("low", data.Low));
-						cmdInsert.Parameters.Add(new SQLiteParameter("close", data.Close));
-						cmdInsert.Parameters.Add(new SQLiteParameter("vol", data.Vol));
-						cmdInsert.ExecuteNonQuery();
-					}
-				}
-				trans.Commit();
-			} 
-			catch(Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				trans.Rollback();
-			}
-			connection.Close();
 		}
 		void Init(string file)
 		{
@@ -109,51 +58,6 @@ namespace TradeTraining
 				}
 			}			
 			return datas;
-		}
-	}
-	class StockData
-	{
-		public string Ticker {get; set;}
-		public long Time {get; set;}
-		public float Open {get; set;}
-		public float High {get; set;}
-		public float Low {get; set;}
-		public float Close {get; set;}
-		public float Vol {get; set;}
-
-		public StockData(string textData)
-		{
-			Parse(this, textData);
-		}
-		public StockData()
-		{}
-		public static bool CanParse(string line)
-		{
-			return Parse(line) != null;	
-		}
-		public static StockData Parse(string line)
-		{
-			StockData data = new StockData();
-			try
-			{
-				Parse(data, line);
-			}
-			catch
-			{
-				return null;
-			}
-			return data;
-		}
-		public static void Parse(StockData data, string line)
-		{
-			string[] strs = line.Split(',');
-			data.Ticker = strs[0];
-			data.Time = long.Parse(strs[1]+strs[2]);
-			data.Open = float.Parse(strs[3]);
-			data.High = float.Parse(strs[4]);
-			data.Low = float.Parse(strs[5]);
-			data.Close = float.Parse(strs[6]);
-			data.Vol = float.Parse(strs[7]);
 		}
 	}
 }
